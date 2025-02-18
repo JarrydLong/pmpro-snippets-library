@@ -18,19 +18,21 @@
 
 	global $pmpro_levels, $pmpro_vat_by_country;
 	
-	$level = ( isset( $_REQUEST['level'] ) ? $pmpro_levels[$_REQUEST['level']] : '' );
 
+	$level = pmpro_getLevelAtCheckout();
 	?>
 	<script type="text/javascript">
 		
 		var vat_rates = <?php echo json_encode( $pmpro_vat_by_country ); ?>;
 
 		jQuery(document).ready(function(){
+
+            console.log('loading');
 			
 			var ajax_url = '<?php echo admin_url( 'admin-ajax.php' ); ?>';
 
-			var country = jQuery( "#bcountry" ).val();
 
+			var country = jQuery( "#eucountry" ).val();
 			var vat_string = '';
 
 			jQuery.each( vat_rates, function( key, val ){
@@ -39,7 +41,7 @@
 
 					var data = {
 						action: 'mypmpro_get_level_cost_text',
-						level_id: '<?php echo $_REQUEST['level']; ?>',
+						level_id: '<?php echo $level->id; ?>',
 						vat_rate: val,
 						discount_code: jQuery("#other_discount_code").val()
 					}
@@ -54,8 +56,8 @@
 
 				}
 			});
-
-			jQuery("body").on("change", "#bcountry", function(){
+ 
+			jQuery("body").on("change", "#eucountry", function(){
 				
 				var country = jQuery(this).val();
 				var vat_string = '';
@@ -64,9 +66,10 @@
 					if( country === key ){
 						//Charge VAT
 
+ 
 						var data = {
 							action: 'mypmpro_get_level_cost_text',
-							level_id: '<?php echo $_REQUEST['level']; ?>',
+							level_id: '<?php echo $level->id; ?>',
 							vat_rate: val,
 							discount_code: jQuery("#other_discount_code").val()
 						}
